@@ -28,8 +28,8 @@ for (var i=0;i<15;i++) {
     bunny.position.y = 100+20*i;
     bunny.anchor.x = 0.5;
     bunny.anchor.y = 0.5;
-    //either use that
-    //bunny.zIndex = i;
+    //that thing is required
+    bunny.zIndex = 0;
     bunny.interactive = true;
     bunny.on('click', resize);
     if (i%2==0) {
@@ -38,7 +38,7 @@ for (var i=0;i<15;i++) {
         bunniesOdd.addChild(bunny);
     }
 }
-//either that
+//either that, either specify good zIndex
 camera.onZOrder = function(sprite) {
     sprite.zOrder = -sprite.position.y;
 };
