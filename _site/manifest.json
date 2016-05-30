@@ -18,7 +18,8 @@
             "title": "Camera lookEuler",
             "entry": "lookEuler.js",
             "plugins": [
-                "pixi-spine"
+                "pixi-spine",
+                "pixi-extra-filters"
             ]
         }
     ],

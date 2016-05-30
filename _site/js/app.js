@@ -155,7 +155,7 @@ var App = {
         else{
             // defaults to the basic example, there might be better way to do this
             // but this will do for now
-            params = {s: "flip", f: "lookEuler.js", title: "Camera lookEuler"};
+            params = {s: "flip", f: "lookEuler.js", title: "Camera lookEuler", plugins: "pixi-spine,pixi-extra-filters"};
         }
 
         return params;
