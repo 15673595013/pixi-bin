@@ -61,7 +61,8 @@ function spawnAlien(d) {
     } else {
         var sprite1 = new PIXI.spine.Spine(loader.resources.pixie.spineData);
 		//either upgrade container to container3d!
-		sprite1.transform = new PIXI.Transform3d();
+		// 'true' is for Static, please use it to speed up your application
+		sprite1.transform = new PIXI.Transform3d(true);
         sprite1.scale.x = sprite1.scale.y = sprite1.scale.z = 0.1;
         sprite1.state.setAnimationByName(0, "running", true);
         //sprite1.alpha = 0.5;
