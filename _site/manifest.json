@@ -21,6 +21,10 @@
                 "pixi-spine",
                 "pixi-extra-filters"
             ]
+        },
+        {
+            "title": "Cards",
+            "entry": "cards.js"
         }
     ],
     "legacy": [
@@ -111,10 +115,6 @@
         {
             "title": "Tinting",
             "entry": "tinting.js"
-        },
-        {
-            "title": "Particle Container [v3]",
-            "entry": "batch-v3.js"
         },
         {
             "title": "Particle Container",
