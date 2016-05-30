@@ -11,7 +11,7 @@ For example using the node [http-server][httpserver] module:
 
 ```bash
 git clone git@github.com:gameofbombs/pixi-bin.git
-cd examples/
+cd pixi-bin/
 
 npm i && npm start
 ```
