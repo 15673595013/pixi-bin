@@ -9,6 +9,19 @@
             "entry": "zindex.js"
         }
     ],
+    "flip": [
+        {
+            "title": "Cube",
+            "entry": "cube.js"
+        },
+        {
+            "title": "Camera lookEuler",
+            "entry": "lookEuler.js",
+            "plugins": [
+                "pixi-spine"
+            ]
+        }
+    ],
     "legacy": [
         {
             "title": "Basics",
@@ -47,20 +60,12 @@
             "entry": "video.js"
         },
         {
-            "title": "Render Texture [v3]",
-            "entry": "render-texture-v3.js"
-        },
-        {
             "title": "Render Texture",
             "entry": "render-texture.js"
         },
         {
             "title": "Textured Mesh",
             "entry": "textured-mesh.js"
-        },
-        {
-            "title": "Custom Filter [v3]",
-            "entry": "custom-filter-v3.js"
         },
         {
             "title": "Custom Filter",

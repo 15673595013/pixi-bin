@@ -1,0 +1,11 @@
+[
+    {
+        "title": "Cube",
+        "entry": "cube.js"
+    },
+    {
+        "title": "Camera lookEuler",
+        "entry": "lookEuler.js",
+        "plugins": ["pixi-spine"]
+    }
+]
