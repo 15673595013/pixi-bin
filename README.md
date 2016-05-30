@@ -1,6 +1,6 @@
-# pixi-examples
+# pixi-bin
 
-Repository for binary files and examples of [gameofbombs pixi.js fork](https://github.com/gameofbombs/pixi.js), available online [here](ghio).
+Binary files and examples for gameofbombs [fork of pixi.js](https://github.com/gameofbombs/pixi.js), available online [here](http://gameofbombs.github.io/pixi-bin/).
 
 ## Running
 
