@@ -25,6 +25,9 @@ loader.load(onAssetsLoaded);
 
 //its for Z-index
 camera.enableDisplayList = true;
+camera.onZOrder = function(innerOrShadow) {
+    innerOrShadow.zOrder = innerOrShadow.position.z;
+};
 
 var blurFilter = new PIXI.filters.BlurFilter();
 blurFilter.blur = 10;
@@ -106,9 +109,13 @@ CardSprite.prototype.update = function(dt) {
 CardSprite.prototype.checkFace = function() {
     var inner = this.inner;
     var cc;
+
+    //very naive implementation, i dont even calculate normals :)
     if (inner.euler.y > Math.PI / 2) {
+        //user sees the back
         cc = 0;
     } else {
+        //user sees the face
         cc = this.showCode || this.code;
     }
     inner.removeChildren();
@@ -116,7 +123,7 @@ CardSprite.prototype.checkFace = function() {
         inner.addChild(this.back);
     } else {
         inner.addChild(this.face);
-    }
+    };
 
     if (cc !== this.showCode) {
         this.showCode = cc;
