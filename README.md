@@ -1,6 +1,6 @@
 # pixi-examples
 
-Repository for the pixi.js v3 examples, available online [here](ghio).
+Repository for binary files and examples of [gameofbombs pixi.js fork](https://github.com/gameofbombs/pixi.js), available online [here](ghio).
 
 ## Running
 
@@ -9,14 +9,16 @@ or download the zip file. Then just run a server pointing to the root of this re
 
 For example using the node [http-server][httpserver] module:
 
-```js
-git clone git@github.com:pixijs/examples.git
+```bash
+git clone git@github.com:gameofbombs/pixi-bin.git
 cd examples/
 
 npm i && npm start
 ```
 
 ## Contributing
+
+After starting local server, you can put your own versions of pixi.js and plugins into 'dev' folder. To test them, specify 'development (local)' in the dropbox or add '&v=dev' to search query.
 
 Ideally you will need to have [node][node] setup on your machine.
 
