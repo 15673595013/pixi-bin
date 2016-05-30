@@ -155,7 +155,7 @@ var App = {
         else{
             // defaults to the basic example, there might be better way to do this
             // but this will do for now
-            params = {s: "camera", f: "zindex.js", title: "Z-index"};
+            params = {s: "flip", f: "lookEuler.js", title: "Camera lookEuler"};
         }
 
         return params;
