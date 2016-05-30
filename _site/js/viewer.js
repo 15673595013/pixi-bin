@@ -7,7 +7,7 @@ $(document).ready(function () {
 
     params = App.getUrlParams();
 
-    document.title = 'pixi.js - ' + params.title;
+    document.title = 'pixi.js gameofbombs - ' + params.title;
 
 
     App.loadGithubTags('version',onTagsLoaded);
@@ -15,11 +15,14 @@ $(document).ready(function () {
     var nav = document.getElementById('navList');
     App.loadManifest(nav);
 
-    var pixiUrl = '_site/js/pixi.js';
+    var pixiUrl = 'bin/pixi.js';
     params.v = params.v || '';
+    if (params.v === 'dev') {
+		pixiUrl = 'dev/pixi.js';
+	} else
     if (params.v !== '') {
         console.log('loading external pixi ...')
-        pixiUrl = 'https://rawgit.com/GoodBoyDigital/pixi.js/' + params.v + '/bin/pixi.js';
+        pixiUrl = 'https://rawgit.com/gameofbombs/pixi-bin/' + params.v + '/bin/pixi.js';
     }
 
     function onTagsLoaded (select)

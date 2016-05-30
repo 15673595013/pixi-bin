@@ -8,9 +8,9 @@ var App = {
             var examples = rootUl;
             var sections = Object.keys(data);
 
-            sections.splice(sections.indexOf('basics'), 1);
+            sections.splice(sections.indexOf('legacy'), 1);
             sections.sort();
-            sections.unshift('basics');
+            sections.push('legacy');
 
             for (var i = 0; i < sections.length; ++i) {
                 var sect = document.createElement('li');
@@ -65,14 +65,15 @@ var App = {
         var select = document.getElementById(selectId);
         console.log('Loading tags from github ...');
 
-        $.getJSON('https://api.github.com/repos/pixijs/pixi.js/git/refs/tags')
+        $.getJSON('https://api.github.com/repos/gameofbombs/pixi-bin/git/refs/tags')
         .done(function (data)
         {
             // filters the tags to only include v3 and above
             data = data
                 .filter(function (tag) {
-                    return tag.ref.indexOf('refs/tags/v3.0.11') === 0 ||
-                        tag.ref.indexOf('refs/tags/v4') === 0;
+                    // return tag.ref.indexOf('refs/tags/v3.0.11') === 0 ||
+                    //     tag.ref.indexOf('refs/tags/v4') === 0;
+                    return true;
                 })
                 .map(function (tag) {
                     return tag.ref.replace('refs/tags/', '');
@@ -83,7 +84,7 @@ var App = {
             for (var i = 0; i < data.length; i++) {
                 var option = document.createElement('option');
 
-                option.value = 'https://cdn.rawgit.com/pixijs/pixi.js/' + data[i] + '/bin/pixi.js';
+                option.value = 'https://cdn.rawgit.com/gameofbombs/pixi-bin/' + data[i] + '/bin/pixi.js';
                 option.textContent = data[i];
                 option.dataset.version = data[i];
                 select.appendChild(option);
@@ -154,7 +155,7 @@ var App = {
         else{
             // defaults to the basic example, there might be better way to do this
             // but this will do for now
-            params = {s: "basics", f: "basic.js", title: "Basic"};
+            params = {s: "camera", f: "zindex.js", title: "Z-index"};
         }
 
         return params;

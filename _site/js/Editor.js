@@ -112,8 +112,9 @@ Editor.prototype = {
         var begin = '<html><head><title>pixi.js example 1</title><style>body,html {margin: 0;padding: 0;border: 0;font-size: 100%;font: inherit;vertical-align: baseline;line-height: 1;}</style>";' +
             '<script src="' + this.pixiUrl+ '"></script></head><body>";';
         if (this.plugins) {
+			var pluginPath = this.pixiUrl.replace('/pixi.js', '/plugins/');
             this.plugins.forEach(function(pluginName) {
-                begin+='<script src="_site/js/plugins/'+pluginName+'.js"></script>';
+                begin+='<script src="'+pluginPath + pluginName+'.js"></script>';
             });
         }
         begin += '<script>/* the window.onload is ABSOLUTELY essential, otherwise opening and closing Iframes does not work;*/ window.onload = function(){';

@@ -1,5 +1,15 @@
 {
-    "basics": [
+    "camera": [
+        {
+            "title": "2 bunnies 2 cameras",
+            "entry": "mirror.js"
+        },
+        {
+            "title": "Z-index",
+            "entry": "zindex.js"
+        }
+    ],
+    "legacy": [
         {
             "title": "Basics",
             "entry": "basic.js"
@@ -55,19 +65,7 @@
         {
             "title": "Custom Filter",
             "entry": "custom-filter.js"
-        }
-    ],
-    "camera": [
-        {
-            "title": "[v4 exp] 2 bunnies 2 cameras",
-            "entry": "mirror.js"
         },
-        {
-            "title": "[v4 exp] Z-order",
-            "entry": "zorder.js"
-        }
-    ],
-    "demos": [
         {
             "title": "MovieClip",
             "entry": "movieclip-demo.js"
@@ -135,9 +133,7 @@
         {
             "title": "Alpha Mask",
             "entry": "alpha-mask.js"
-        }
-    ],
-    "filters": [
+        },
         {
             "title": "Filter",
             "entry": "filter.js"
@@ -149,9 +145,7 @@
         {
             "title": "Displacement Map",
             "entry": "displacement-map.js"
-        }
-    ],
-    "picture": [
+        },
         {
             "title": "Border artifacts",
             "entry": "border-artifacts.js",
@@ -165,9 +159,7 @@
             "plugins": [
                 "pixi-picture"
             ]
-        }
-    ],
-    "spine": [
+        },
         {
             "title": "Dragon",
             "entry": "dragon.js",
@@ -194,15 +186,6 @@
             "entry": "spineboy.js",
             "plugins": [
                 "pixi-spine"
-            ]
-        }
-    ],
-    "textures": [
-        {
-            "title": "DirectDrawSurface (DDS)",
-            "entry": "dds.js",
-            "plugins": [
-                "pixi-compressed-textures"
             ]
         }
     ]
