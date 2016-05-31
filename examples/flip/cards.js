@@ -40,6 +40,7 @@ function CardSprite() {
     this.shadow = new PIXI.Sprite3d(tex["black.png"]);
     this.shadow.anchor.set(0.5);
     this.shadow.scale.set(1.0);
+    this.shadow.alpha = 0.7;
     //TRY IT WITH FILTER:
     // this.shadow.filters = [blurFilter];
     //all shadows are UNDER all cards
