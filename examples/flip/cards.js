@@ -8,7 +8,7 @@ var stage = new PIXI.Container();
 
 var camera = new PIXI.Camera3d();
 camera.easyPerspective(renderer, 350, 30, 10000);
-camera.lookEuler.x = -Math.PI / 5.5;
+camera.lookEuler.x = Math.PI / 5.5;
 stage.addChild(camera);
 
 var cards = new PIXI.Container3d();
@@ -25,8 +25,14 @@ loader.load(onAssetsLoaded);
 
 //its for Z-index
 camera.enableDisplayList = true;
-camera.onZOrder = function(innerOrShadow) {
-    innerOrShadow.zOrder = innerOrShadow.position.z;
+camera.onZOrder = function(item) {
+    item.zOrder = item.position.z;
+    if (item.zIndex == 2) {
+        //its inner card, and since all matrices are calculated at the point of sorting
+        // we can check which side is actually visible
+        // if we do that in update(), it will be slower by 1 frame
+        item.parent.checkFace();
+    }
 };
 
 var blurFilter = new PIXI.filters.BlurFilter();
@@ -54,13 +60,19 @@ function CardSprite() {
     this.addChild(this.shadow);
     this.addChild(this.inner);
 
+    //construct "inner" from back and face
     this.back = new PIXI.Sprite3d(tex["cover1.png"]);
     this.back.anchor.set(0.5);
     this.face = new PIXI.Container3d();
+    this.inner.addChild(this.back);
+    this.inner.addChild(this.face);
     this.code = 0;
     this.showCode = -1;
     this.inner.euler.y = Math.PI;
     this.scale.set(0.2, 0.2, 0.2);
+
+    //construct "face" from four sprites
+    this.createFace();
 }
 
 CardSprite.prototype = Object.create(PIXI.Container3d.prototype);
@@ -69,13 +81,10 @@ CardSprite.prototype.createFace = function() {
     var face = this.face;
     face.removeChildren();
     var tex = loader.resources['cards'].textures;
-    var code = this.showCode;
-    var num = code & 0xf;
-    var suit = code >> 4;
     var sprite = new PIXI.Sprite3d(tex['white1.png']);
-    var sprite2 = new PIXI.Sprite3d(num > 0 ? tex[suit % 2 + "_" + num + ".png"]: PIXI.Texture.EMPTY);
-    var sprite3 = new PIXI.Sprite3d(suit !== 0 ? tex[suit + "_big.png"] : PIXI.Texture.EMPTY);
-    var sprite4 = new PIXI.Sprite3d(suit !== 0 ? tex[suit + "_small.png"] : PIXI.Texture.EMPTY);
+    var sprite2 = new PIXI.Sprite3d(PIXI.Texture.EMPTY);
+    var sprite3 = new PIXI.Sprite3d(PIXI.Texture.EMPTY);
+    var sprite4 = new PIXI.Sprite3d(PIXI.Texture.EMPTY);
     sprite2.y = -120;
     sprite2.x = -80;
     sprite3.y = 70;
@@ -90,6 +99,20 @@ CardSprite.prototype.createFace = function() {
     face.addChild(sprite2);
     face.addChild(sprite3);
     face.addChild(sprite4);
+
+    this.updateFace();
+};
+
+CardSprite.prototype.updateFace = function() {
+    var tex = loader.resources['cards'].textures;
+    var code = this.showCode;
+    var num = code & 0xf;
+    var suit = code >> 4;
+
+    var face = this.face;
+    face.children[1].texture = num > 0 ? tex[suit % 2 + "_" + num + ".png"]: PIXI.Texture.EMPTY;
+    face.children[2].texture = suit !== 0 ? tex[suit + "_big.png"] : PIXI.Texture.EMPTY;
+    face.children[3].texture = suit !== 0 ? tex[suit + "_small.png"] : PIXI.Texture.EMPTY;
 };
 
 CardSprite.prototype.update = function(dt) {
@@ -104,38 +127,31 @@ CardSprite.prototype.update = function(dt) {
 
     //assignment is overriden, so its actually calling euler.copy(this.euler)
     this.shadow.euler = inner.euler;
-
-    this.checkFace();
 };
 
 CardSprite.prototype.checkFace = function() {
     var inner = this.inner;
     var cc;
 
-    //very naive implementation, i dont even calculate normals :)
-    if (inner.euler.y > Math.PI / 2) {
+    var v = inner.computedTransform.getVisibleSide(this.worldProjection.eyeVec);
+    if (v > 0) {
         //user sees the back
         cc = 0;
     } else {
         //user sees the face
         cc = this.showCode || this.code;
     }
-    inner.removeChildren();
     if (cc==0) {
-        inner.addChild(this.back);
+        this.back.renderable = true;
+        this.face.renderable = false;
     } else {
-        inner.addChild(this.face);
-    };
+        this.back.renderable = false;
+        this.face.renderable = true;
+    }
 
     if (cc !== this.showCode) {
         this.showCode = cc;
-        if (cc == 0) {
-            if (this.face.children.length > 0) {
-                this.face.removeChildren();
-            }
-        } else {
-            this.createFace();
-        }
+        this.updateFace();
     }
 };
 

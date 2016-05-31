@@ -137,13 +137,13 @@ function animate() {
     });
 
     ang += 0.01;
-    camera.lookEuler.y = -ang;
-    camera.lookEuler.x = Math.PI / 6;
+    camera.lookEuler.y = ang;
+    camera.lookEuler.x = -Math.PI / 6;
 
     alienContainer.children.forEach(function (plane) {
         if (plane.alwaysFront) {
             //1. rotate sprite plane to the camera
-			
+
 			//Spine object dont have 'euler' in them, but we upgraded their transform and can access it directly
             plane.children[0].transform.euler.x = -Math.PI/6;
             //2. rotate sprite to the camera
@@ -156,4 +156,3 @@ function animate() {
 
     requestAnimationFrame(animate);
 }
-    
