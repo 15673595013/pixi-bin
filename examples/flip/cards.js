@@ -1,7 +1,7 @@
 /*global PIXI */
 'use strict';
 
-var renderer = new PIXI.WebGLRenderer(800, 600, {resolution: 1 });
+var renderer = new PIXI.WebGLRenderer(800, 600, {resolution: 1, antialias: true });
 document.body.appendChild(renderer.view);
 
 var stage = new PIXI.Container();
