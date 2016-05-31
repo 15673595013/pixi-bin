@@ -30,7 +30,8 @@ camera.onZOrder = function(innerOrShadow) {
 };
 
 var blurFilter = new PIXI.filters.BlurFilter();
-blurFilter.blur = 10;
+blurFilter.blur = 0.2;
+
 
 function CardSprite() {
     PIXI.Container3d.call(this);
@@ -39,10 +40,10 @@ function CardSprite() {
     //shadow will be under card
     this.shadow = new PIXI.Sprite3d(tex["black.png"]);
     this.shadow.anchor.set(0.5);
-    this.shadow.scale.set(1.0);
+    this.shadow.scale.set(0.98);
     this.shadow.alpha = 0.7;
     //TRY IT WITH FILTER:
-    // this.shadow.filters = [blurFilter];
+    this.shadow.filters = [blurFilter];
     //all shadows are UNDER all cards
     this.shadow.zIndex = 1;
     this.inner = new PIXI.Container3d();
@@ -53,7 +54,7 @@ function CardSprite() {
     this.addChild(this.shadow);
     this.addChild(this.inner);
 
-    this.back = new PIXI.Sprite3d(tex["cover.png"]);
+    this.back = new PIXI.Sprite3d(tex["cover1.png"]);
     this.back.anchor.set(0.5);
     this.face = new PIXI.Container3d();
     this.code = 0;
@@ -71,7 +72,7 @@ CardSprite.prototype.createFace = function() {
     var code = this.showCode;
     var num = code & 0xf;
     var suit = code >> 4;
-    var sprite = new PIXI.Sprite3d(tex['white.png']);
+    var sprite = new PIXI.Sprite3d(tex['white1.png']);
     var sprite2 = new PIXI.Sprite3d(num > 0 ? tex[suit % 2 + "_" + num + ".png"]: PIXI.Texture.EMPTY);
     var sprite3 = new PIXI.Sprite3d(suit !== 0 ? tex[suit + "_big.png"] : PIXI.Texture.EMPTY);
     var sprite4 = new PIXI.Sprite3d(suit !== 0 ? tex[suit + "_small.png"] : PIXI.Texture.EMPTY);
