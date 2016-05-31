@@ -14,7 +14,7 @@ stage.addChild(camera);
 var cards = new PIXI.Container3d();
 cards.position.y = -50;
 // MAKE CARDS LARGER:
-// cards.scale.set(2,2,2);
+cards.scale.set(1.5,1.5,1.5);
 camera.addChild(cards);
 
 // create a new loader
