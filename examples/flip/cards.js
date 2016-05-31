@@ -166,10 +166,27 @@ function onClick(event) {
     }
 }
 
+function addText(txt) {
+    var style = {
+        font: "normal 80px Arial",
+        fill: '#f5ffe3',
+        dropShadow: true,
+        dropShadowColor: 'rgba(1, 1, 1, 0.4)',
+        dropShadowDistance: 6,
+        wordWrap: false
+    };
+    var basicText = new PIXI.Text(txt, style);
+    basicText.position.x = -240;
+    basicText.position.y = 20;
+    basicText.zIndex = 3;
+    camera.addChild(basicText);
+}
+
 function onAssetsLoaded() {
     //background must be UNDER camera, it doesnt have z-index or any other bullshit for camera
     stage.addChildAt(new PIXI.Sprite(loader.resources.table.texture), 0);
     dealHand();
+    addText('Tap on cards');
     // start animating
     ticker.start();
 }
