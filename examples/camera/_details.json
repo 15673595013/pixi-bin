@@ -6,5 +6,10 @@
     {
         "title": "Z-index",
         "entry": "zindex.js"
+    },
+    {
+        "title": "Z-index display V2",
+        "entry": "zindex-display-v2.js",
+        "plugins": ["pixi-display"]
     }
 ]
