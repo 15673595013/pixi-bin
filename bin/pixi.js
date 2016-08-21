@@ -18234,6 +18234,11 @@ function Camera2d() {
     this._invProjectedViewport.size = 4;
 }
 
+// constructor
+Camera2d.prototype = Object.create(Container.prototype);
+Camera2d.prototype.constructor = Camera2d;
+module.exports = Camera2d;
+
 Object.defineProperties(Camera2d.prototype, {
     /**
      * look position is something like pivot of container
@@ -18266,11 +18271,6 @@ Object.defineProperties(Camera2d.prototype, {
         }
     }
 });
-
-// constructor
-Camera2d.prototype = Object.create(Container.prototype);
-Camera2d.prototype.constructor = Camera2d;
-module.exports = Camera2d;
 
 Camera2d.prototype.initTransform = function () {
     this.displayObjectInitTransform(true);
@@ -21341,17 +21341,18 @@ Graphics.prototype._renderSpriteRect = function (renderer)
 
         this._spriteRect = new Sprite(Graphics._SPRITE_TEXTURE);
         this._spriteRect.tint = this.graphicsData[0].fillColor;
+        this._spriteRect.alpha = this.graphicsData[0].fillAlpha;
     }
 
-    this._spriteRect.worldAlpha = this.worldAlpha;
-
-    Graphics._SPRITE_TEXTURE._frame.width = rect.width;
-    Graphics._SPRITE_TEXTURE._frame.height = rect.height;
+    this._spriteRect.worldAlpha = this.worldAlpha * this._spriteRect.alpha;
 
     this._spriteRect.computedTransform = this.computedTransform;
 
     this._spriteRect.anchor.x = -rect.x / rect.width;
     this._spriteRect.anchor.y = -rect.y / rect.height;
+    this._spriteRect.size.x = rect.width;
+    this._spriteRect.size.y = rect.height;
+    this._spriteRect.calculateVertices();
 
     this._spriteRect._renderWebGL(renderer);
 };
@@ -21582,7 +21583,7 @@ Graphics.prototype.generateCanvasTexture = function(scaleMode, resolution)
 {
     resolution = resolution || 1;
 
-    var bounds = this.getLocalBounds();
+    var bounds = this._legacyLocalBounds();
 
     var canvasBuffer = new RenderTexture.create(bounds.width * resolution, bounds.height * resolution);
 
@@ -22187,7 +22188,7 @@ GraphicsRenderer.prototype.render = function(graphics)
     // This  could be speeded up for sure!
     var shader = this.primitiveShader;
     renderer.bindShader(shader);
-    renderer.bindProjection(this.worldProjection);
+    renderer.bindProjection(graphics.worldProjection);
     renderer.state.setBlendMode( graphics.blendMode );
 
     for (var i = 0, n = webGL.data.length; i < n; i++)
@@ -35224,8 +35225,6 @@ function TilingSprite(texture, width, height)
 {
     core.Sprite.call(this, texture);
 
-    this._size._x = width || 100;
-    this._size._y = height || 100;
     /**
      * The scaling of the image that is being tiled
      *
@@ -35243,6 +35242,22 @@ function TilingSprite(texture, width, height)
     //TODO: for v4.1 make dirty uvs separated, and tileScale/tilePosition observable
 
     /**
+     * The width of the tiling sprite
+     *
+     * @member {number}
+     * @private
+     */
+    this._width = width || 100;
+
+    /**
+     * The height of the tiling sprite
+     *
+     * @member {number}
+     * @private
+     */
+    this._height = height || 100;
+
+    /**
      * An internal WebGL UV cache.
      *
      * @member {PIXI.TextureUvs}
@@ -35255,9 +35270,53 @@ function TilingSprite(texture, width, height)
     this._glDatas = [];
 }
 
+Object.defineProperties(TilingSprite.prototype, {
+    /**
+     * The width of the sprite, setting this will actually modify the scale to achieve the value set
+     *
+     * @member {number}
+     * @memberof PIXI.extras.TilingSprite#
+     */
+    width: {
+        get: function ()
+        {
+            return this._width;
+        },
+        set: function (value)
+        {
+            this._width = value;
+        }
+    },
+
+    /**
+     * The height of the TilingSprite, setting this will actually modify the scale to achieve the value set
+     *
+     * @member {number}
+     * @memberof PIXI.extras.TilingSprite#
+     */
+    height: {
+        get: function ()
+        {
+            return this._height;
+        },
+        set: function (value)
+        {
+            this._height = value;
+        }
+    }
+});
+
 TilingSprite.prototype = Object.create(core.Sprite.prototype);
 TilingSprite.prototype.constructor = TilingSprite;
 module.exports = TilingSprite;
+
+/**
+ * TilingSprite doesnt need that
+ * @private
+ */
+TilingSprite.prototype._onTextureUpdate = function () {
+
+};
 
 /**
  * Renders the object using the WebGL renderer
@@ -35323,15 +35382,15 @@ TilingSprite.prototype._renderWebGL = function (renderer)
     uFrame[3] = textureUvs.y2 - textureUvs.y0;
     glData.shader.uniforms.uFrame = uFrame;
 
-    var width = this._size._x;
-    var height = this._size._y;
+    var width = this._width;
+    var height = this._height;
 
     var uTransform = glData.shader.uniforms.uTransform;
     uTransform[0] = (this.tilePosition.x % (textureWidth * this.tileScale.x)) / width;
     uTransform[1] = (this.tilePosition.y % (textureHeight * this.tileScale.y)) / height;
     uTransform[2] = ( textureBaseWidth / width ) * this.tileScale.x;
     uTransform[3] = ( textureBaseHeight / height ) * this.tileScale.y;
-    glData.shader.uniforms.translationMatrix = this.computedTransform.matrix2d.toArray(true);
+    glData.shader.setUniformMatrix('translationMatrix', this.computedTransform.matrix);
     glData.shader.uniforms.uTransform = uTransform;
     glData.shader.uniforms.alpha = this.worldAlpha;
 
@@ -35394,6 +35453,8 @@ TilingSprite.prototype._renderCanvas = function (renderer)
         this._canvasPattern = tempCanvas.context.createPattern( tempCanvas.canvas, 'repeat' );
     }
 
+    var width = this._width;
+    var height = this._height;
     // set context state..
     context.globalAlpha = this.worldAlpha;
     context.setTransform(transform.a * resolution,
@@ -35406,8 +35467,8 @@ TilingSprite.prototype._renderCanvas = function (renderer)
     // TODO - this should be rolled into the setTransform above..
     context.scale(this.tileScale.x,this.tileScale.y);
 
-    context.translate(modX + (this.anchor.x * -this._size._x),
-                      modY + (this.anchor.y * -this._size._y));
+    context.translate(modX + (this.anchor.x * width),
+                      modY + (this.anchor.y * height));
 
     // check blend mode
     var compositeOperation = renderer.blendModes[this.blendMode];
@@ -35420,8 +35481,8 @@ TilingSprite.prototype._renderCanvas = function (renderer)
     context.fillStyle = this._canvasPattern;
     context.fillRect(-modX,
                      -modY,
-                     this._size._x / this.tileScale.x,
-                     this._size._y / this.tileScale.y);
+                     width / this.tileScale.x,
+                     height / this.tileScale.y);
 
 
     //TODO - pretty sure this can be deleted...
@@ -35431,8 +35492,8 @@ TilingSprite.prototype._renderCanvas = function (renderer)
 
 
 TilingSprite.prototype.calculateVertices = function () {
-    var width = this._size._x;
-    var height = this._size._y;
+    var width = this._width;
+    var height = this._height;
 
     var w0 = width * (1-this.anchor.x);
     var w1 = width * -this.anchor.x;
@@ -35440,30 +35501,6 @@ TilingSprite.prototype.calculateVertices = function () {
     var h0 = height * (1-this.anchor.y);
     var h1 = height * -this.anchor.y;
     this.geometry.setRectCoords(0, w1, h1, w0, h0);
-};
-
-/**
- * Checks if a point is inside this tiling sprite
- * @param point {PIXI.Point} the point to check
- */
-TilingSprite.prototype.containsLocalPoint = function( point )
-{
-    var width = this._size._x;
-    var height = this._size._y;
-    var x1 = -width * this.anchor.x;
-    var y1;
-
-    if ( point.x > x1 && point.x < x1 + width )
-    {
-        y1 = -height * this.anchor.y;
-
-        if ( point.y > y1 && point.y < y1 + height )
-        {
-            return true;
-        }
-    }
-
-    return false;
 };
 
 /**
@@ -35889,7 +35926,7 @@ function TilingShader(gl)
 {
     Shader.call(this,
         gl,
-        "#define GLSLIFY 1\nattribute vec2 aVertexPosition;\n\nattribute vec2 aTextureCoord;\n\nattribute vec4 aColor;\n\nuniform mat3 projectionMatrix;\n\nuniform mat3 translationMatrix;\n\nuniform vec4 uFrame;\n\nuniform vec4 uTransform;\n\nvarying vec2 vTextureCoord;\n\nvarying vec4 vColor;\n\nvoid main(void)\n\n{\n\n    gl_Position = vec4((projectionMatrix * translationMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);\n\n    vec2 coord = aTextureCoord;\n\n    coord -= uTransform.xy;\n\n    coord /= uTransform.zw;\n\n    vTextureCoord = coord;\n\n    vColor = vec4(aColor.rgb * aColor.a, aColor.a);\n\n}\n\n",
+        "#define GLSLIFY 1\nattribute vec2 aVertexPosition;\nattribute vec2 aTextureCoord;\nattribute vec4 aColor;\n\nuniform mat4 projectionMatrix;\nuniform mat4 translationMatrix;\n\nuniform vec4 uFrame;\nuniform vec4 uTransform;\n\nvarying vec2 vTextureCoord;\nvarying vec4 vColor;\n\nvoid main(void)\n{\n    gl_Position = projectionMatrix * translationMatrix * vec4(aVertexPosition, 0.0, 1.0);\n\n    vec2 coord = aTextureCoord;\n    coord -= uTransform.xy;\n    coord /= uTransform.zw;\n    vTextureCoord = coord;\n\n    vColor = vec4(aColor.rgb * aColor.a, aColor.a);\n}\n",
         "#define GLSLIFY 1\nvarying vec2 vTextureCoord;\n\nvarying vec4 vColor;\n\nuniform sampler2D uSampler;\n\nuniform vec4 uColor;\n\nuniform vec4 uFrame;\n\nuniform vec2 uPixelSize;\n\nvoid main(void)\n\n{\n\n   \tvec2 coord = mod(vTextureCoord, uFrame.zw);\n\n   \tcoord = clamp(coord, uPixelSize, uFrame.zw - uPixelSize);\n\n   \tcoord += uFrame.xy;\n\n   \tvec4 sample = texture2D(uSampler, coord);\n\n  \tvec4 color = vec4(uColor.rgb * uColor.a, uColor.a);\n\n   \tgl_FragColor = sample * color ;\n\n}\n\n"
     );
 }
@@ -37766,7 +37803,14 @@ InteractionManager.prototype.dispatchEvent = function ( displayObject, eventStri
  */
 InteractionManager.prototype.mapPositionToPoint = function ( point, x, y )
 {
-    var rect = this.interactionDOMElement.getBoundingClientRect();
+    var rect;
+    // IE 11 fix
+    if(!this.interactionDOMElement.parentElement)
+    {
+        rect = { x: 0, y: 0, width: 0, height: 0 };
+    } else {
+        rect = this.interactionDOMElement.getBoundingClientRect();
+    }
     point.x = ( ( x - rect.left ) * (this.interactionDOMElement.width  / rect.width  ) ) / this.resolution;
     point.y = ( ( y - rect.top  ) * (this.interactionDOMElement.height / rect.height ) ) / this.resolution;
 };
