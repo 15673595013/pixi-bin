@@ -6,7 +6,9 @@ document.body.appendChild(renderer.view);
 var stage = new PIXI.Container();
 
 // create a new background sprite
-var background = new PIXI.Sprite.fromImage('_assets/BGrotate.jpg');
+var texture = PIXI.Texture.fromImage('_assets/BGrotate.jpg');
+var background = new PIXI.extras.PictureTilingSprite(texture, 800, 600);
+background.blendMode = PIXI.BLEND_MODES.HARD_LIGHT;
 stage.addChild(background);
 //speed up the process, because OVERLAY and HARD_LIGHT will use copyTex instead of readPixels
 stage.filters = [new PIXI.filters.VoidFilter()];
@@ -32,7 +34,7 @@ for (var i = 0; i < totaldudes; i++)
     dude.position.y = Math.floor(Math.random() * renderer.height);
 
     // The important bit of this example, this is how you change the default blend mode of the sprite
-    dude.blendMode = Math.random()>0.5? PIXI.BLEND_MODES.OVERLAY:PIXI.BLEND_MODES.HARD_LIGHT;
+    //dude.blendMode = Math.random()>0.5? PIXI.BLEND_MODES.OVERLAY:PIXI.BLEND_MODES.HARD_LIGHT;
 
     // create some extra properties that will control movement
     dude.direction = Math.random() * Math.PI * 2;
